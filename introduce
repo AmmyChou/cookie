@@ -2,3 +2,58 @@
 由于HTTP是无状态协议，cookie也同时用作验证用户信息的凭证。
 最主要的作用 --验证
 
+浏览器提供了：document.cookie  
+浏览器window并没有封装对于cookie的操作，只有唯一的一个document.cookie可以查看（不能查看http-only属性的cookie）
+
+添加cookie 值为中文需要转码 重复名称会覆盖：
+function setCookie(name, val, day) {
+  let expireDate = new Date();
+  expireDate.setDate(expireDate.getDate() + day);
+  document.cookie = `${name}=${val};expires=${expireDate.toGMTString()}`;
+}
+
+读取cookie 返回一个包含cookie键值对的数组：
+function getCookies() {
+  let cookies = [];
+  if(document.cookie) {
+    let cookieArr = document.cookie.split(';');
+    for (let i = 0;i<cookieArr.length;i++) {
+      let keyArr = cookieArr[i].split("=");
+      let name = keyArr[0];
+      let val = keyArr[1];
+      cookies.push({name: val});
+    }
+  } else {
+    return false;
+  }
+  return cookies;
+}
+
+删除cookie 把失效日期设置为过期：
+function removeCookie(name) {
+  let cookies = getCookies();
+  if (cookies) {
+    for(let cookie of cookies) {
+     if(cookie.name === name) {
+        setCookie(name, null, -99);
+        break;
+      }
+    }
+  } else {
+    return false;
+  }
+}
+
+最后啦~~~
+let CookieManager = {
+  setCookie,
+  getCookies,
+  removeCookie
+};
+
+
+
+
+
+
+
